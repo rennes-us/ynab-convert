@@ -4,13 +4,15 @@
 Convert external CSV data from multiple sources into YNAB's CSV import format.
 """
 
-from __future__ import print_function
 import sys
 import csv
-import ConfigParser
+try:
+    from ConfigParser import SafeConfigParser # Python 2
+except ImportError:
+    from configparser import SafeConfigParser # Python 3
 import argparse
 
-CONFIG = ConfigParser.SafeConfigParser()
+CONFIG = SafeConfigParser()
 CONFIG.read('ynab_convert.ini')
 CONFIG_MAIN    = dict(CONFIG.items('main'))
 CONFIG_SHOPIFY = dict(CONFIG.items('shopify'))
@@ -19,7 +21,7 @@ CONFIG_CHASE   = dict(CONFIG.items('chase'))
 def write(fileobj, data):
     """Write YNAB-style data to a new CSV file."""
 
-    writer = csv.DictWriter(fileobj, fieldnames=data[0].keys())
+    writer = csv.DictWriter(fileobj, fieldnames=sorted(data[0].keys()))
     writer.writeheader()
     for row in data:
         writer.writerow(row)
@@ -63,7 +65,7 @@ def read_and_convert_shopify_transactions(filename):
     """Read in Shopify transaction CSV and convert to YNAB-style."""
 
     data = []
-    with open(filename, 'rb') as csvfile:
+    with open(filename, 'r') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             order = row['Order'].strip('#')
@@ -106,7 +108,7 @@ def read_and_convert_shopify_transactions(filename):
 
 def read_and_convert_shopify_payouts(filename):
     data = []
-    with open(filename, 'rb') as csvfile:
+    with open(filename, 'r') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             status = row['Status'] # will this sometimes be pending?
@@ -126,7 +128,7 @@ def read_and_convert_chase(filename):
     """Read in Shopify transaction CSV and convert to YNAB-style."""
     data = []
     # Type,Trans Date,Post Date,Description,Amount
-    with open(filename, 'rb') as csvfile:
+    with open(filename, 'r') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             date = row['Trans Date']
