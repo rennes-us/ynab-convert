@@ -102,6 +102,22 @@ def read_and_convert_shopify_transactions(filename):
                 entry['Payee']    = CONFIG_MAIN['payee_you']
                 entry['Category'] = CONFIG_SHOPIFY['category_fees']
                 data.append(entry)
+            elif row['Type'] == "chargeback":
+                entry = {}
+                entry['Date']     = date
+                entry['Memo']     = 'order # %s chargeback' % order
+                _set_amount(entry, row['Amount'])
+                entry['Payee']    = 'Shopify'
+                entry['Category'] = CONFIG_SHOPIFY['category_chargebacks']
+                entry_fee = {}
+                entry_fee['Date']     = date
+                entry_fee['Memo']     = 'order # %s chargeback fee' % order
+                entry_fee['Inflow']   = ''
+                entry_fee['Outflow']  = row['Fee']
+                entry_fee['Payee']    = 'Shopify'
+                entry_fee['Category'] = CONFIG_SHOPIFY['category_fees']
+                data.append(entry)
+                data.append(entry_fee)
             else:
                 raise Exception("Category \"%s\" not recognized" % row['Type'])
     return data
