@@ -141,7 +141,7 @@ def read_and_convert_shopify_payouts(filename):
     return data
 
 def read_and_convert_chase(filename):
-    """Read in Shopify transaction CSV and convert to YNAB-style."""
+    """Read in Chase transaction CSV and convert to YNAB-style."""
     data = []
     # Type,Trans Date,Post Date,Description,Amount
     with open(filename, 'r') as csvfile:
@@ -171,9 +171,9 @@ def read_and_convert_chase(filename):
             elif row['Type'].lower() == "fee":
                 entry['Payee'] = CONFIG_CHASE['chase_payee']
                 if row['Description'] == 'FOREIGN TRANSACTION FEE':
-                    entry['Category'] = CONFIG_CHASE['chase_fees_category_foreign'] 
+                    entry['Category'] = CONFIG_CHASE['chase_fees_category_foreign']
                 else:
-                    entry['Category'] = CONFIG_CHASE['chase_fees_category'] 
+                    entry['Category'] = CONFIG_CHASE['chase_fees_category']
             # Anything else
             else:
                 raise Exception("Category \"%s\" not recognized" % row['Type'])
