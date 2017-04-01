@@ -8,6 +8,7 @@ This can read from any combination of:
  * Shopify's Transaction Export CSV
  * Shopify's Payouts Export CSV
  * Chase bank's Activity Export CSV
+ * A generic CSV export used by small banks and credit unions
 
 ## Bugs and Limitations
 
@@ -32,6 +33,17 @@ This can read from any combination of:
  3. Choose appropriate date range.
  4. Choose CSV.
  5. Click "Download Activity."
+
+## Export from Banking Site
+
+I don't know what product these banks are using for their online services but
+it looks like something off-the-shelf.   When I have a better idea of what this
+is and who uses it I'll add more detail here.
+
+ 1. Log in and choose account
+ 2. Choose a date range on the upper-left
+ 3. Click "Export" on the upper-right
+ 4. Choose "Excel (.csv)"
 
 ## Convert
 

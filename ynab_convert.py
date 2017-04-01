@@ -17,6 +17,7 @@ CONFIG.read('ynab_convert.ini')
 CONFIG_MAIN    = dict(CONFIG.items('main'))
 CONFIG_SHOPIFY = dict(CONFIG.items('shopify'))
 CONFIG_CHASE   = dict(CONFIG.items('chase'))
+CONFIG_BANK    = dict(CONFIG.items('bank'))
 
 def write(fileobj, data):
     """Write YNAB-style data to a new CSV file."""
@@ -26,7 +27,7 @@ def write(fileobj, data):
     for row in data:
         writer.writerow(row)
 
-def convert(shopify_trans=None, shopify_payouts=None, chase=None):
+def convert(shopify_trans=None, shopify_payouts=None, chase=None, bank=None):
     """Convert external data into YNAB format.
     
     Takes in CSV filenames and produces a list of dicts using YNAB's key names.
@@ -43,6 +44,8 @@ def convert(shopify_trans=None, shopify_payouts=None, chase=None):
         data.extend(read_and_convert_shopify_payouts(shopify_payouts))
     if chase:
         data.extend(read_and_convert_chase(chase))
+    if bank:
+        data.extend(read_and_convert_bank(bank))
     return data
 
 def _shopify_date_to_ynab(text):
@@ -180,6 +183,36 @@ def read_and_convert_chase(filename):
             data.append(entry)
     return data
 
+def read_and_convert_bank(filename):
+    """Read in a common bank CSV format and convert to YNAB-style."""
+    data = []
+    fields = ['Transaction Number', 'Date', 'Description', 'Memo',
+            'Amount Debit', 'Amount Credit', 'Balance', 'Check Number', 'Fees']
+    with open(filename, 'r') as csvfile:
+        reader = csv.DictReader(csvfile, fieldnames=fields)
+        for x in range(4): next(reader) # skip the header and field names
+        for row in reader:
+            if row['Fees'] != "":
+                raise Exception("Bank fees not supported yet (transaction %s)" % row['Transaction Number'])
+            date = row['Date']
+            memo = "%s: %s" % ( row["Description"], row["Memo"] )
+            if row['Check Number'] != "":
+                memo = "ck %s" % row['Check Number']
+            payee = ""
+            if row['Description'] == 'International Wire Wdrl Fee':
+                payee = CONFIG_BANK['bank']
+            entry = {}
+            entry['Date']     = date
+            entry['Memo']     = memo
+            entry['Category'] = ""
+            entry['Payee']    = payee
+            entry['Inflow']   = row["Amount Credit"]
+            entry['Outflow']  = row["Amount Debit"].lstrip('-') # make positive
+            data.append(entry)
+    if filter(lambda d: d['Payee'] != '', data) == []:
+        raise Warning('No payees set.  YNAB may not import correctly.')
+    return data
+
 def main(args):
     parser = argparse.ArgumentParser(description=\
             "Converts external CSV data from multiple sources into YNAB's CSV import format",\
@@ -187,6 +220,7 @@ def main(args):
     parser.add_argument("--shopify-trans", help="Shopify transactions CSV file")
     parser.add_argument("--shopify-payouts", help="Shopify payouts CSV file")
     parser.add_argument("--chase", help="Chase credit card CSV file")
+    parser.add_argument("--bank", help="bank CSV file")
     parsed = parser.parse_args(args[1:])
     data = convert(**vars(parsed))
     write(sys.stdout, data)
