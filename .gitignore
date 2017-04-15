@@ -1,3 +1,4 @@
 *.pyc
 ynab_convert.ini
 data
+*.csv
