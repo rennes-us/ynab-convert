@@ -208,6 +208,7 @@ def read_and_convert_bank(filename):
         reader = csv.DictReader(csvfile, fieldnames=fields)
         for x in range(4): next(reader) # skip the header and field names
         for row in reader:
+            category = ""
             if row['Fees'] != "":
                 raise Exception("Bank fees not supported yet (transaction %s)" % row['Transaction Number'])
             date = row['Date']
@@ -216,11 +217,12 @@ def read_and_convert_bank(filename):
                 memo = "ck %s" % row['Check Number']
             payee = ""
             if row['Description'] == 'International Wire Wdrl Fee':
+                category = CONFIG_BANK['wire_fee_category']
                 payee = CONFIG_BANK['bank']
             entry = {}
             entry['Date']     = date
             entry['Memo']     = memo
-            entry['Category'] = ""
+            entry['Category'] = category
             entry['Payee']    = payee
             entry['Inflow']   = row["Amount Credit"]
             entry['Outflow']  = row["Amount Debit"].lstrip('-') # make positive
