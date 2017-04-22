@@ -180,7 +180,7 @@ def read_and_convert_chase(filename):
                 entry['Payee'] = "Transfer: %s" % CONFIG_CHASE["payment_account"]
                 entry['Memo']  = "" # none needed
             # A refund of a purchase or fee.
-            elif row['Type'].lower() == "refund":
+            elif row['Type'].lower() == "refund" or row['Type'].lower() == "return":
                 entry['Payee'] = CONFIG_MAIN["payee_you"]
             # Cash back
             elif row['Type'].lower() == "adjustment":
