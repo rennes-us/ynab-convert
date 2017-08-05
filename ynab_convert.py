@@ -197,6 +197,8 @@ def read_and_convert_chase(filename):
             else:
                 raise Exception("Category \"%s\" not recognized" % row['Type'])
             data.append(entry)
+    if filter(lambda d: d['Payee'] != '', data) == []:
+        raise Warning('No payees set.  YNAB may not import correctly.')
     return data
 
 def read_and_convert_bank(filename):
