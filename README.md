@@ -1,8 +1,14 @@
 # ynab-convert
 
 A Python script to convert a few different financial CSV formats into [YNAB]'s
-[CSV import format].  This works for me under YNAB 4 ("classic") but I don't
-know how it behaves with their new web-based service.
+[CSV import format].
+
+**This works under YNAB 4 ("classic") but not the "new YNAB" web-based service
+as it does not respect the Category column in imported CSV files.  See also:
+[bank2ynab](https://github.com/bank2ynab/bank2ynab), where this really should
+be.**
+
+-------------------------------------------------------------------------------
 
 This can read from any combination of:
  * Shopify's Transaction Export CSV
@@ -20,11 +26,11 @@ This can read from any combination of:
 
 ## Export from Shopify
 
- 1. Go to <https://myshopify.com/admin/payments/transactions>
+ 1. Go to <https://yoursite.myshopify.com/admin/payments/transactions>
  2. Click "Export" in the upper-right
    * Choose "Export payment transactions by date"
    * Choose "CSV for Excel, Numbers, and other spreadsheet programs"
- 3. And also export from here: <https://rennes.myshopify.com/admin/payments/payouts>
+ 3. And also export from here: <https://yoursite.myshopify.com/admin/payments/payouts>
 
 ## Export from Chase
 
